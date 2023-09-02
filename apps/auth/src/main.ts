@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AuthModule } from './auth.module';
-import { CustomExceptionFilter } from 'libs/common/custom-exception.filter';
+import { CustomExceptionFilter } from 'libs/common/exceptions/custom-exception.filter';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import {rateLimit} from 'express-rate-limit';
 import * as helmet from 'helmet';
