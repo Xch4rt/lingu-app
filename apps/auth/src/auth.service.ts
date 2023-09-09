@@ -1,8 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { DatabaseService } from 'libs/database/prisma/database.service';
+import { DatabaseService } from '../../../libs/database/prisma/database.service';
 import { RegisterUserAuthDto } from './dto/register-user.auth.dto';
 import * as argon2 from 'argon2';
-import { CustomException } from 'libs/common/custom-exception';
+import { CustomException } from '../../../libs/common/custom-exception';
 import { LoginAuthDto } from './dto/login-user.auth.dto';
 
 @Injectable()
@@ -42,7 +42,6 @@ export class AuthService {
       status: 'success',
       message: 'User created successfully',
       data: {
-        id: user.id,
         username: user.username,
         email: user.email,
         createdAt: user.createdAt,
