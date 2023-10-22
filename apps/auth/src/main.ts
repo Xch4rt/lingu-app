@@ -3,9 +3,15 @@ import { AuthModule } from './auth.module';
 import { CustomExceptionFilter } from 'libs/common/custom-exception.filter';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import {rateLimit} from 'express-rate-limit';
+import { initializerFirebase } from './firebase.config';
+import * as dotenv from 'dotenv';
 import * as helmet from 'helmet';
 
 async function bootstrap() {
+  dotenv.config();
+
+  const {app: firebaseApp, analytics: firebaseAnalytics } = initializerFirebase();
+  
   const app = await NestFactory.create(AuthModule);
 
   app.useGlobalFilters(new CustomExceptionFilter());
