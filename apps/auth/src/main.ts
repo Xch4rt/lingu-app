@@ -10,7 +10,7 @@ import * as helmet from 'helmet';
 async function bootstrap() {
   dotenv.config();
 
-  const {app: firebaseApp, analytics: firebaseAnalytics } = initializerFirebase();
+  const {app: firebaseApp } = initializerFirebase();
   
   const app = await NestFactory.create(AuthModule);
 

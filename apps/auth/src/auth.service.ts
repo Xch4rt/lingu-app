@@ -50,7 +50,7 @@ export class AuthService {
       message: 'User created successfully',
       data: {
         username: user.username,
-        email: user.email,
+        email: userFirebase.email,
         createdAt: user.createdAt,
       },
     }
@@ -81,6 +81,7 @@ export class AuthService {
       this.logger.error('Invalid credentials');
       throw new CustomException('Invalid credentials', 400);
     }
+    console.log(userFirebase)
 
     const user = await this.dbService.user.findUnique({
       where: {
@@ -89,6 +90,7 @@ export class AuthService {
       },
     });
 
+    console.log(user)
     if (!user) {
       this.logger.error('User not found');
       throw new CustomException('User not found', 404);
