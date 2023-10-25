@@ -4,12 +4,17 @@ import { RegisterUserAuthDto } from './dto/register-user.auth.dto';
 import * as argon2 from 'argon2';
 import { CustomException } from '../../../libs/common/custom-exception';
 import { LoginAuthDto } from './dto/login-user.auth.dto';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { initializerFirebase } from './firebase.config';
+import { sign } from 'crypto';
 
 @Injectable()
 export class AuthService {
   constructor (private readonly dbService : DatabaseService) {}
   
   private readonly logger = new Logger(AuthService.name);
+
+  private readonly firebaseAuth = initializerFirebase().firebaseAuth;
 
   async registerUser (registerUserDto : RegisterUserAuthDto) {
     const { username, email, password } = registerUserDto;
@@ -28,11 +33,13 @@ export class AuthService {
 
     const hashedPwd = await argon2.hash(password);
 
+    const userCredential = await createUserWithEmailAndPassword(this.firebaseAuth, email, password);
+    const userFirebase = userCredential.user;
+
     const user = await this.dbService.user.create({
       data: {
-        username,
-        email,
-        password: hashedPwd,
+        id: userFirebase.uid,
+        username
       },
     });
 
@@ -43,48 +50,59 @@ export class AuthService {
       message: 'User created successfully',
       data: {
         username: user.username,
-        email: user.email,
+        email: userFirebase.email,
         createdAt: user.createdAt,
       },
     }
   }
 
   async loginUser (loginUserDto : LoginAuthDto) {
-    const { username, password } = loginUserDto;
+    const { email, password } = loginUserDto;
 
-    const user = await this.validateUser(username, password);
+    const {data} = await this.validateUser(email, password);
 
     return {
       status: 'success',
       message: 'User logged in successfully',
       data: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
+        id: data.user.id,
+        username: data.user.username,
+        email: data.userFirebase.email,
       },
     }
   }
 
-  private async validateUser (username : string, password : string) {
+  private async validateUser (email : string, password : string) {
+    
+    const userCredential = await signInWithEmailAndPassword(this.firebaseAuth, email, password);
+    const userFirebase = userCredential.user;
+
+    if (!userFirebase) {
+      this.logger.error('Invalid credentials');
+      throw new CustomException('Invalid credentials', 400);
+    }
+    console.log(userFirebase)
+
     const user = await this.dbService.user.findUnique({
       where: {
-        username,
+        id: userFirebase.uid,
+        isDeleted: false
       },
     });
 
+    console.log(user)
     if (!user) {
       this.logger.error('User not found');
       throw new CustomException('User not found', 404);
     }
 
-    const isPasswordValid = await argon2.verify(user.password, password);
 
-    if (!isPasswordValid) {
-      this.logger.error('Invalid credentials');
-      throw new CustomException('Invalid credentials', 400);
-    }
-
-    return user;
+    return {
+      data: {
+        user: user,
+        userFirebase: userFirebase
+      }
+    };
   }
 
 }

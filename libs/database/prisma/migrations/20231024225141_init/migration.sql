@@ -38,10 +38,8 @@ CREATE TABLE "Sentence" (
 
 -- CreateTable
 CREATE TABLE "User" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "username" TEXT NOT NULL,
-    "email" TEXT NOT NULL,
-    "password" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "deletedAt" TIMESTAMP(3),
@@ -53,7 +51,7 @@ CREATE TABLE "User" (
 -- CreateTable
 CREATE TABLE "User_Profile" (
     "id" SERIAL NOT NULL,
-    "userId" INTEGER NOT NULL,
+    "userId" TEXT NOT NULL,
     "firstName" TEXT NOT NULL,
     "lastName" TEXT NOT NULL,
     "iconUrl" TEXT NOT NULL,
@@ -68,7 +66,7 @@ CREATE TABLE "User_Profile" (
 -- CreateTable
 CREATE TABLE "User_Word" (
     "id" SERIAL NOT NULL,
-    "userId" INTEGER NOT NULL,
+    "userId" TEXT NOT NULL,
     "wordId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -86,9 +84,6 @@ CREATE INDEX "word_unique" ON "Word" USING HASH ("word");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
-
--- CreateIndex
-CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- AddForeignKey
 ALTER TABLE "Meaning" ADD CONSTRAINT "Meaning_userWordId_fkey" FOREIGN KEY ("userWordId") REFERENCES "User_Word"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
