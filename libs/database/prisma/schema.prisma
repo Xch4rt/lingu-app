@@ -46,10 +46,8 @@ model Sentence {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
+  id        String      @id 
   username  String   @unique
-  email     String   @unique
-  password  String
   userWords User_Word[]
   profile   User_Profile[]
   createdAt DateTime @default(now())
@@ -60,7 +58,7 @@ model User {
 
 model User_Profile {
   id        Int      @id @default(autoincrement())
-  userId    Int
+  userId    String
   user      User     @relation(fields: [userId], references: [id])
   firstName String
   lastName  String
@@ -73,7 +71,7 @@ model User_Profile {
 
 model User_Word {
   id        Int      @id @default(autoincrement())
-  userId    Int
+  userId    String
   user      User     @relation(fields: [userId], references: [id])
   wordId    Int
   word      Word     @relation(fields: [wordId], references: [id])

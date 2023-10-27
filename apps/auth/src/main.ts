@@ -2,10 +2,19 @@ import { NestFactory } from '@nestjs/core';
 import { AuthModule } from './auth.module';
 import { CustomExceptionFilter } from 'libs/common/exceptions/custom-exception.filter';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ValidationPipe, Logger } from '@nestjs/common';
 import {rateLimit} from 'express-rate-limit';
+import { initializerFirebase } from './firebase.config';
+import * as dotenv from 'dotenv';
 import * as helmet from 'helmet';
 
 async function bootstrap() {
+  dotenv.config();
+
+  const logger = new Logger('bootstrap');
+
+  const {app: firebaseApp } = initializerFirebase();
+  
   const app = await NestFactory.create(AuthModule);
 
   app.useGlobalFilters(new CustomExceptionFilter());
@@ -46,7 +55,8 @@ async function bootstrap() {
   );
 
 
-
   await app.listen(port);
+
+  logger.log(`Application listening on port ${port}`);
 }
 bootstrap();
