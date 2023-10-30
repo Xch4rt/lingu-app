@@ -21,5 +21,5 @@ export class RegisterUserDto {
     })
     @IsNotEmpty()
     @IsNumber()
-    userId: number;
+    userId: string;
 }

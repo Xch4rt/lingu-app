@@ -166,7 +166,7 @@ export class UsersService {
     }
   }
 
-  async findUserProfileByUserId(userId: number) {
+  async findUserProfileByUserId(userId: string) {
     const user = await this.dbService.user.findUnique({
       where: {
         id: userId,
