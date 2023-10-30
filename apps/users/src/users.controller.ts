@@ -24,7 +24,7 @@ export class UsersController {
   @Get('profile/:id')
   @UseGuards(FirebaseAuthGuard)
   async findOne(@Param() id: string) {
-    return this.usersService.findUserProfileByUserId(+id);
+    return this.usersService.findUserProfileByUserId(id);
   }
 
   @Delete(':id')
