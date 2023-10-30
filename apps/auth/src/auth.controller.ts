@@ -11,7 +11,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
-  @UseGuards(FirebaseAuthGuard)
+  
   async registerUser(@Body() registerUserDto: RegisterUserAuthDto) {
     return this.authService.registerUser(registerUserDto);
   }
