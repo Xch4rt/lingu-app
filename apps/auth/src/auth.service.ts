@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { DatabaseService } from '../../../libs/database/prisma/database.service';
 import { RegisterUserAuthDto } from './dto/register-user.auth.dto';
 import * as argon2 from 'argon2';
-import { CustomException } from '../../../libs/common/custom-exception';
+import { CustomException } from '../../../libs/common/exceptions/custom-exception';
 import { LoginAuthDto } from './dto/login-user.auth.dto';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { initializerFirebase } from './firebase.config';
