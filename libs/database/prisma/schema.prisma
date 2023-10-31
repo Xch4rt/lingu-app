@@ -15,7 +15,7 @@ datasource db {
 model Word {
   id        Int      @id @default(autoincrement())
   word      String   @unique 
-  userWords User_Word[]
+  langWords Lang_Word[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   deletedAt DateTime?
@@ -26,8 +26,8 @@ model Word {
 model Meaning {
   id        Int      @id @default(autoincrement())
   meaning   String
-  userWordId Int
-  userWord  User_Word @relation(fields: [userWordId], references: [id])
+  langWordId Int
+  langWord  Lang_Word @relation(fields: [langWordId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   deletedAt DateTime?
@@ -37,8 +37,8 @@ model Meaning {
 model Sentence {
   id        Int     @id @default(autoincrement())
   sentence  String 
-  userWordId Int
-  userWord  User_Word @relation(fields: [userWordId], references: [id])
+  langWordId Int
+  langWord  Lang_Word @relation(fields: [langWordId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   deletedAt DateTime?
@@ -48,8 +48,8 @@ model Sentence {
 model User {
   id        String      @id 
   username  String   @unique
-  userWords User_Word[]
   profile   User_Profile[]
+  language User_Language[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   deletedAt DateTime?
@@ -69,14 +69,38 @@ model User_Profile {
   isDeleted Boolean  @default(false)
 }
 
-model User_Word {
+model Lang_Word {
   id        Int      @id @default(autoincrement())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
   wordId    Int
   word      Word     @relation(fields: [wordId], references: [id])
+  userLangId Int
+  userLang  User_Language @relation(fields: [userLangId], references: [id])
   meanings  Meaning[]
   sentences Sentence[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+  isDeleted Boolean  @default(false)
+}
+
+
+model User_Language {
+  id Int @id @default(autoincrement())
+  userId String
+  user User @relation(fields: [userId], references: [id])
+  languageId Int
+  lang Language @relation(fields: [languageId], references: [id])
+  langWord  Lang_Word[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+  isDeleted Boolean  @default(false)
+}
+
+model Language {
+  id Int @id @default(autoincrement())
+  lang String 
+  userLang User_Language[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   deletedAt DateTime?
