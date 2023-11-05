@@ -99,7 +99,8 @@ model User_Language {
 
 model Language {
   id Int @id @default(autoincrement())
-  lang String 
+  lang String
+  code String
   userLang User_Language[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
