@@ -106,4 +106,58 @@ export class LanguagesService {
       throw new CustomException("Error with finding lang", 400)
     }
   }
+
+  async getLangsByUser(paginationLangDto: PaginationDto, userId: string) {
+    const { page = 1, perPage = 10, search = '' } = paginationLangDto;
+    const skip: number = Number((page - 1) * perPage);
+    const take: number = Number(perPage);
+
+    const whereClause: any = search
+      ? {
+        userId: userId,
+        lang: {
+          OR: [
+            {
+              code: {
+                contains: search,
+                mode: 'insensitive'
+              },
+            },
+            {
+              lang: {
+                contains: search,
+                mode: 'insensitive'
+              }
+            }
+          ]
+        }
+      }
+      : { userId: userId };
+
+    try {
+      const userLanguages = await this.dbService.user_Language.findMany({
+        where: whereClause,
+        take: take,
+        skip: skip
+      });
+
+      const totalLangs = userLanguages.length;
+
+      return {
+        data: {
+          userLanguages: userLanguages
+        },
+        metaData: {
+          page,
+          lastPage: Math.ceil(totalLangs / perPage),
+          totalLangs
+        }
+      }
+    } catch (error) {
+      this.logger.error("An error has occurred finding user languages: ", error);
+      throw new CustomException("Error with finding user languages", 400);
+    }
+
+
+  }
 }

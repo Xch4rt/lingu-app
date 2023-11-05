@@ -1,4 +1,4 @@
-import { Logger, Controller, Get, Post, Query  } from '@nestjs/common';
+import { Logger, Controller, Get, Post, Query, Param } from '@nestjs/common';
 import { LanguagesService } from './languages.service';
 import * as fs from 'fs';
 import * as csvParser from 'csv-parser'
@@ -64,5 +64,14 @@ export class LanguagesController {
       throw new Error(error)
     }
   }
-
+  @Get('user/:userId')
+  async getLangsByUserId(@Query() paginationLangDto: PaginationDto, @Param('userId') userId: string) {
+    try {
+      const res = await this.languagesService.getLangsByUser(paginationLangDto, userId);
+      return res;
+    } catch (error) {
+      this.logger.error(error);
+      throw new CustomException('Error with the request', 400);
+    }
+  }
 }
