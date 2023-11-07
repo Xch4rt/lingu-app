@@ -4,6 +4,8 @@ import { RegisterUserDto } from './dto/register-user.users.dto';
 import { PaginationDto } from 'libs/common/dto/pagination/pagination.dto';
 import { CustomException } from 'libs/common/exceptions/custom-exception';
 import { UpdateUserDto } from './dto/update-user.users.dto';
+import { RegisterLangsByUser } from './dto/register-langs-user.dto';
+import { PrismaClient } from '@prisma/client';
 @Injectable()
 export class UsersService {
   constructor(private readonly dbService: DatabaseService) { }
@@ -39,6 +41,61 @@ export class UsersService {
     } catch (error) {
       this.logger.error(error);
       throw new CustomException('User not created', 500);
+    }
+  }
+
+  async addLangPreferencesUser(langsByUserDto: RegisterLangsByUser) {
+    const { langs, uid } = langsByUserDto;
+    let transaction;
+    const prisma = new PrismaClient();
+    try {
+
+      transaction = await prisma.$transaction([
+        prisma.user.findUnique({
+          where: { id: uid },
+        }),
+        ...langs.map((lang) =>
+          prisma.language.findFirst({
+            where: {
+              lang: lang
+            },
+          })
+        ),
+      ]);
+      const userExists = transaction[0];
+
+
+      if (!userExists) {
+        this.logger.error("User does not exist");
+        throw new CustomException(`User with uid: ${uid} does not exist`, 401);
+      }
+      for (let i = 1; i < transaction.length; i++) {
+        const language = transaction[i];
+
+        if (!language) {
+          this.logger.error(`Language '${langs[i - 1]}' does not exist`);
+          throw new CustomException(`Language '${langs[i - 1]}' does not exist`, 400);
+        }
+
+        await prisma.user_Language.create({
+          data: {
+            userId: uid,
+            languageId: language.id,
+          },
+        });
+      }
+
+      await prisma.$queryRaw`COMMIT`;
+
+
+    } catch (error) {
+      if (transaction) {
+        await prisma.$queryRaw`ROLLBACK`;
+      }
+      this.logger.error(`An error has ocurred creating a preference with user uid: ${uid}`)
+      throw new CustomException(`Error creating the preference for the user uid ${uid}`, 400)
+    } finally {
+      prisma.$disconnect();
     }
   }
 
